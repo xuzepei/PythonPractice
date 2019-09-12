@@ -23,6 +23,7 @@ def showBuckets():
     buckets = list(storage_client.list_buckets())
     print(buckets)
 
+
 def getBlobInfo(filename):
 
     print(">>>>>>>>>getBlobInfo: ", filename)
@@ -48,8 +49,11 @@ def getBlobInfo(filename):
     blob = bucket.blob(destination_blob_name)
 
     policy = blob.get_iam_policy()
-    print(">>>>>>>>>policy: " + policy)
-
+    metadata = blob.metadata or {}
+    metadata['color'] = 'red'
+    blob.metadata = metadata
+    #print(">>>>>>>>>policy: " + str(policy.to_api_repr()))
+    print(">>>>>>>>>metadata: " + str(blob.metadata))
 
 # Upload file to Firebase Storage
 def uploadFileToFirebaseStorage(filename):
@@ -79,6 +83,13 @@ def uploadFileToFirebaseStorage(filename):
 
 
     blob = bucket.blob(destination_blob_name)
+
+    #add metadata
+    blob.cache_control = 86400
+    # metadata = blob.metadata or {}
+    # #metadata['Cache-Control'] = '86400'
+    # blob.metadata = metadata
+
     # try:
     #     blob.delete()
     # except exceptions.NotFound:
@@ -151,9 +162,8 @@ def readConfig(filename):
             if len(name) > 0:
                 zip_filename = name + '.zip'
                 if os.path.exists(zip_filename):
-                    #uploadFileToFirebaseStorage(zip_filename)
-                    #uploadFileToAliyun(zip_filename)
-                    getBlobInfo(zip_filename)
+                   	uploadFileToFirebaseStorage(zip_filename)
+                   	uploadFileToAliyun(zip_filename)
                 else:
                     print("The file does not exist: " + zip_filename)
 
@@ -162,8 +172,8 @@ def readConfig(filename):
             if index >= 5:
                 break
 
-    #uploadFileToFirebaseStorage(filename)
-    #uploadFileToAliyun(filename)
+    uploadFileToFirebaseStorage(filename)
+    uploadFileToAliyun(filename)
 
 
 _MODE = 'test'
