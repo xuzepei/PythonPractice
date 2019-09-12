@@ -23,6 +23,34 @@ def showBuckets():
     buckets = list(storage_client.list_buckets())
     print(buckets)
 
+def getBlobInfo(filename):
+
+    print(">>>>>>>>>getBlobInfo: ", filename)
+
+    # Instantiates a client
+    storage_client = storage.Client()
+
+    # The name for the new bucket
+    bucket_name = 'color0001-a80ed.appspot.com'
+
+    # get bucket
+    try:
+        bucket = storage_client.get_bucket(bucket_name)
+    except exceptions.NotFound:
+        print(">>>>>>>>>Exceptions: that bucket is not found!")
+        return
+    
+    if _MODE == 'test':
+        destination_blob_name = "ios/test/" + filename
+    elif _MODE == 'pro':
+        destination_blob_name = "ios/" + filename
+
+    blob = bucket.blob(destination_blob_name)
+
+    policy = blob.get_iam_policy()
+    print(">>>>>>>>>policy: " + policy)
+
+
 # Upload file to Firebase Storage
 def uploadFileToFirebaseStorage(filename):
     
@@ -123,8 +151,9 @@ def readConfig(filename):
             if len(name) > 0:
                 zip_filename = name + '.zip'
                 if os.path.exists(zip_filename):
-                    uploadFileToFirebaseStorage(zip_filename)
-                    uploadFileToAliyun(zip_filename)
+                    #uploadFileToFirebaseStorage(zip_filename)
+                    #uploadFileToAliyun(zip_filename)
+                    getBlobInfo(zip_filename)
                 else:
                     print("The file does not exist: " + zip_filename)
 
@@ -133,8 +162,8 @@ def readConfig(filename):
             if index >= 5:
                 break
 
-    uploadFileToFirebaseStorage(filename)
-    uploadFileToAliyun(filename)
+    #uploadFileToFirebaseStorage(filename)
+    #uploadFileToAliyun(filename)
 
 
 _MODE = 'test'
